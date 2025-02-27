@@ -1,0 +1,15 @@
+{
+  "name": "Nixpkgs",
+  "package": "nixpkgs",
+  "index": "index.html",
+  "selectors": {
+    "h2.title code": "Function",
+    "div.section div.titlepage div div h2.title": "Section",
+    "div.section div.titlepage div div h3.title": "Section",
+    "div.section div.titlepage div div h4.title": "Function",
+    "span.term a.term code": "Setting"
+  },
+  "icon32x32": "favicon.png",
+  "allowJS": false,
+  "ExternalURL": "https://nixos.org/manual/nixpkgs/unstable/"
+}
