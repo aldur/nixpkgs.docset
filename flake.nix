@@ -1,5 +1,5 @@
 {
-  description = "Dash/Zeal docset from nixpkgs-manual";
+  description = "Dash/Zeal docset from nixpkgs-manual and nixos-manual";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   inputs.systems.url = "github:nix-systems/default";
   inputs.flake-utils = {
@@ -38,15 +38,14 @@
             runHook postInstall
           '';
         };
-      in
-      {
-        packages.default = pkgs.stdenv.mkDerivation {
+
+        nixpkgs-docset = pkgs.stdenv.mkDerivation {
           pname = "nixpkgs-docset";
           version = pkgs.lib.trivial.version;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
-            fileset = ./dashing.json;
+            fileset = ./nixpkgs.dashing.json;
           };
 
           buildInputs = [
@@ -58,7 +57,7 @@
             cp -r "${pkgs.nixpkgs-manual}/share/doc/nixpkgs/." .
             mv manual.html index.html
             rm nixpkgs-manual.epub
-            dashing build .
+            dashing build --config ./nixpkgs.dashing.json .
             rm nixpkgs.docset/Contents/Resources/Documents/favicon.png
           '';
 
@@ -68,6 +67,48 @@
             cp -r nixpkgs.docset $out/
             runHook postInstall
           '';
+        };
+
+        nixos-manual =
+          # NOTE: We kinda hack it here by forcing it to support any `system` (including macOS)
+          # Because of lazy evaluation, this works.
+          (import (nixpkgs + "/nixos/release.nix") { supportedSystems = [ system ]; }).manualHTML.${system};
+
+        nixos-docset = pkgs.stdenv.mkDerivation {
+          pname = "nixos-docset";
+          version = pkgs.lib.trivial.version;
+
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = ./nixos.dashing.json;
+          };
+
+          buildInputs = [
+            pkgs.dashing
+          ];
+
+          buildPhase = ''
+            cp ${favicon}/favicon.png .
+            cp -r "${nixos-manual}/share/doc/nixos/." .
+            dashing build  --config ./nixos.dashing.json .
+            rm nixos.docset/Contents/Resources/Documents/favicon.png
+          '';
+
+          installPhase = ''
+            mkdir -p $out/
+            runHook preInstall
+            cp -r nixos.docset $out/
+            runHook postInstall
+          '';
+        };
+      in
+      {
+        packages.default = pkgs.symlinkJoin {
+          name = "nix docsets";
+          paths = [
+            nixpkgs-docset
+            nixos-docset
+          ];
         };
       }
     );
