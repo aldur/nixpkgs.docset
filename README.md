@@ -6,13 +6,20 @@ This repository packages:
 - The [Nixpkgs reference manual](https://nixos.org/manual/nixpkgs/unstable/) into a `nixpkgs.docset`.
 - The [NixOS Manual](https://nixos.org/manual/nixpkgs/unstable/) into a `nixos.docset`.
 
+## The docsets
+
+You can find the docsets:
+
+1. In the [releases section](https://github.com/aldur/nixpkgs.docset/releases).
+1. As artifacts from CI builds (weekly, from nightly).
+
 ## Build
 
 ```bash
 nix build
 ```
 
-You'll find the produced `.docset`s in the `result`.
+You'll find the produced `.docset`s under the `result` directory:
 
 ```bash
     » ls -la result/

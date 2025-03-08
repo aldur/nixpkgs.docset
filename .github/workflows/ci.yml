@@ -2,6 +2,8 @@ on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    - cron: '* * * * 0'
 
 jobs:
   lints:
@@ -13,5 +15,6 @@ jobs:
       - run: nix build .
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
+          name: nix-docsets
           path: result/*.docset
           if-no-files-found: "error"
