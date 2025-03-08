@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
       - uses: DeterminateSystems/nix-installer-action@a48face58194521af687ce7df4c802b1b558e743
+      - run: nix flake update
+        if: ${{ github.event_name == 'schedule' }}
       - run: nix build .
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
