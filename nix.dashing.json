@@ -1,0 +1,30 @@
+{
+  "name": "Nix",
+  "package": "nix",
+  "index": "index.html",
+  "selectors": {
+    "dl dt a code": "Function",
+    "h1:not(.menu-title)": "Section",
+    "h2": "Section",
+    "h3": "Section"
+  },
+  "icon32x32": "favicon.png",
+  "allowJS": false,
+  "ExternalURL": "https://nix.dev/manual/nix/latest/",
+  "ignore": [
+    "Name",
+    "Options",
+    "Examples",
+    "Settings",
+    "Synopsis",
+    "Description",
+    "Common Options",
+    "Logging-related options",
+    "Common evaluation options",
+    "Common flake-related options",
+    "Miscellaneous global options",
+    "Options that change the interpretation of installables",
+    "Contributors",
+    "Common Environment Variables"
+  ]
+}

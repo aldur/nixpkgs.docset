@@ -1,5 +1,6 @@
 {
-  description = "Dash/Zeal docset from nixpkgs-manual and nixos-manual";
+  description = "Dash/Zeal docset for nix-manual, nixpkgs-manual, and nixos-manual";
+
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   inputs.systems.url = "github:nix-systems/default";
   inputs.flake-utils = {
@@ -7,8 +8,24 @@
     inputs.systems.follows = "systems";
   };
 
+  inputs.nix = {
+    url = "github:NixOS/nix";
+
+    # inputs.nixpkgs.follows = "nixpkgs";
+    inputs.nixpkgs-23-11.follows = "";
+    inputs.nixpkgs-regression.follows = "";
+    inputs.flake-compat.follows = "";
+    inputs.flake-parts.follows = "";
+    inputs.git-hooks-nix.follows = "";
+  };
+
   outputs =
-    { nixpkgs, flake-utils, ... }:
+    {
+      nixpkgs,
+      nix,
+      flake-utils,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
@@ -101,6 +118,35 @@
             runHook postInstall
           '';
         };
+
+        nix-manual = nix.packages.${system}.nix-manual;
+        nix-docset = pkgs.stdenv.mkDerivation {
+          pname = "nix-docset";
+          version = nix-manual.version;
+
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = ./nix.dashing.json;
+          };
+
+          buildInputs = [
+            pkgs.dashing
+          ];
+
+          buildPhase = ''
+            cp -r "${nix-manual}/share/doc/nix/manual/." .
+            rm print.html
+            dashing build  --config ./nix.dashing.json .
+            rm nix.docset/Contents/Resources/Documents/favicon.svg
+          '';
+
+          installPhase = ''
+            mkdir -p $out/
+            runHook preInstall
+            cp -r nix.docset $out/
+            runHook postInstall
+          '';
+        };
       in
       {
         packages.default = pkgs.symlinkJoin {
@@ -108,8 +154,10 @@
           paths = [
             nixpkgs-docset
             nixos-docset
+            nix-docset
           ];
         };
+        packages.nix-docset = nix-docset;
       }
     );
 }
