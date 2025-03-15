@@ -19,10 +19,15 @@
     inputs.git-hooks-nix.follows = "";
   };
 
+  inputs.nix-darwin = {
+    url = "github:LnL7/nix-darwin";
+  };
+
   outputs =
     {
       nixpkgs,
       nix,
+      nix-darwin,
       flake-utils,
       ...
     }:
@@ -119,6 +124,35 @@
           '';
         };
 
+        nix-darwin-manual = nix-darwin.packages.${system}.manualHTML;
+        nix-darwin-docset = pkgs.stdenv.mkDerivation {
+          pname = "nix-darwin-docset";
+          version = pkgs.lib.trivial.version;
+
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = ./nix-darwin.dashing.json;
+          };
+
+          buildInputs = [
+            pkgs.dashing
+          ];
+
+          buildPhase = ''
+            cp ${favicon}/favicon.png .
+            cp -r "${nix-darwin-manual}/share/doc/darwin/." .
+            dashing build  --config ./nix-darwin.dashing.json .
+            rm nix-darwin.docset/Contents/Resources/Documents/favicon.png
+          '';
+
+          installPhase = ''
+            mkdir -p $out/
+            runHook preInstall
+            cp -r nix-darwin.docset $out/
+            runHook postInstall
+          '';
+        };
+
         nix-manual = nix.packages.${system}.nix-manual;
         nix-docset = pkgs.stdenv.mkDerivation {
           pname = "nix-docset";
@@ -155,9 +189,11 @@
             nixpkgs-docset
             nixos-docset
             nix-docset
+            nix-darwin-docset
           ];
         };
-        packages.nix-docset = nix-docset;
+        packages.nix-darwin-docset = nix-darwin-docset;
+        packages.nix-darwin-manual = nix-darwin-manual;
       }
     );
 }
