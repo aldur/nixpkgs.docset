@@ -127,7 +127,7 @@
         nix-darwin-manual = nix-darwin.packages.${system}.manualHTML;
         nix-darwin-docset = pkgs.stdenv.mkDerivation {
           pname = "nix-darwin-docset";
-          version = pkgs.lib.trivial.version;
+          version = nix-darwin.rev;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -183,17 +183,27 @@
         };
       in
       {
-        packages.default = pkgs.symlinkJoin {
-          name = "nix docsets";
-          paths = [
-            nixpkgs-docset
-            nixos-docset
-            nix-docset
-            nix-darwin-docset
-          ];
-        };
-        packages.nix-darwin-docset = nix-darwin-docset;
-        packages.nix-darwin-manual = nix-darwin-manual;
+        packages =
+          let
+            all = [
+              nixpkgs-docset
+              nixos-docset
+              nix-docset
+              nix-darwin-docset
+            ];
+          in
+          {
+            default = pkgs.symlinkJoin {
+              name = "nix docsets";
+              paths = all;
+            };
+          }
+          // builtins.listToAttrs (
+            map (value: {
+              name = value.pname;
+              inherit value;
+            }) all
+          );
       }
     );
 }
