@@ -41,7 +41,7 @@
 
           src = pkgs.fetchurl {
             url = "https://nixos.org/favicon.ico";
-            hash = "sha256-cJjvgyuApfVDESJ3jol2U3UR9ntKgxzJx/DJu/+YZIk=";
+            hash = "sha256-EpCpswrphO6WTtA2goDbg2p+3NMeEOcbPKLfXcyTH0A=";
           };
 
           dontUnpack = true;
