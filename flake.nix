@@ -19,6 +19,11 @@
     inputs.git-hooks-nix.follows = "";
   };
 
+  inputs.home-manager = {
+    url = "github:nix-community/home-manager";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
   inputs.nix-darwin = {
     url = "github:LnL7/nix-darwin";
   };
@@ -29,6 +34,7 @@
       nix,
       nix-darwin,
       flake-utils,
+      home-manager,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -181,6 +187,34 @@
             runHook postInstall
           '';
         };
+
+        home-manager-manual = home-manager.packages.${system}.docs-html;
+        home-manager-docset = pkgs.stdenv.mkDerivation {
+          pname = "home-manager-docset";
+          version = (nixpkgs.lib.importJSON (home-manager + "/release.json")).release;
+
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = ./home-manager.dashing.json;
+          };
+
+          buildInputs = [
+            pkgs.dashing
+          ];
+
+          buildPhase = ''
+            cp ${favicon}/favicon.png .
+            cp -r "${home-manager-manual}/share/doc/home-manager/." .
+            dashing build  --config ./home-manager.dashing.json .
+          '';
+
+          installPhase = ''
+            mkdir -p $out/
+            runHook preInstall
+            cp -r home-manager.docset $out/
+            runHook postInstall
+          '';
+        };
       in
       {
         packages =
@@ -190,6 +224,7 @@
               nixos-docset
               nix-docset
               nix-darwin-docset
+              home-manager-docset
             ];
           in
           {

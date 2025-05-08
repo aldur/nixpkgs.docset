@@ -1,0 +1,17 @@
+{
+  "name": "Home Manager",
+  "package": "home-manager",
+  "index": "index.xhtml",
+  "selectors": {
+    "h2.title code": "Function",
+    "div.section div.titlepage div div h2.title": "Section",
+    "div.section div.titlepage div div h3.title": "Section",
+    "div.section div.titlepage div div h4.title": "Function",
+    "div.section div.titlepage div div h5.title": "Function",
+    "div.section div.titlepage div div h6.title": "Function",
+    "span.term a.term code": "Setting"
+  },
+  "icon32x32": "favicon.png",
+  "allowJS": false,
+  "ExternalURL": "https://nix-community.github.io/home-manager/"
+}
