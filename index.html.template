@@ -171,36 +171,36 @@
     </p>
 
     <ul>
-      <li class="all-docsets"><a href="./result/all.tgz" title="Download all docsets as a single archive">All</a></li>
+      <li class="all-docsets"><a href="./all.tgz" title="Download all docsets as a single archive">All</a></li>
     </ul>
 
     <ul>
       <li>
-        <a href="./result/nix.docset.tgz" title="Download the Nix reference manual">
+        <a href="./nix.docset.tgz" title="Download the Nix reference manual">
           <span class="docset-title">Nix Reference Manual</span>
           <span class="docset-version">@nix-version@</span>
         </a>
       </li>
       <li>
-        <a href="./result/nixpkgs.docset.tgz" title="Download the Nixpkgs reference manual">
+        <a href="./nixpkgs.docset.tgz" title="Download the Nixpkgs reference manual">
           <span class="docset-title">Nixpkgs Reference Manual</span>
           <span class="docset-version">@nixpkgs-version@</span>
         </a>
       </li>
       <li>
-        <a href="./result/nixos.docset.tgz" title="Download the NixOS Manual">
+        <a href="./nixos.docset.tgz" title="Download the NixOS Manual">
           <span class="docset-title">NixOS Manual</span>
           <span class="docset-version">@nixos-version@</span>
         </a>
       </li>
       <li>
-        <a href="./result/nix-darwin.docset.tgz" title="Download the nix-darwin Manual">
+        <a href="./nix-darwin.docset.tgz" title="Download the nix-darwin Manual">
           <span class="docset-title">nix-darwin Manual</span>
           <span class="docset-version">@nix-darwin-version@</span>
         </a>
       </li>
       <li>
-        <a href="./result/home-manager.docset.tgz" title="Download the Home Manager Manual">
+        <a href="./home-manager.docset.tgz" title="Download the Home Manager Manual">
           <span class="docset-title">Home Manager Manual</span>
           <span class="docset-version">@home-manager-version@</span>
         </a>
