@@ -13,7 +13,7 @@ This repository packages:
 You can find the docsets:
 
 1. In the [releases section][5] (sporadically updated).
-1. On [GitHub pages](https://aldur.github.io/nixpkgs.docset).
+1. In [GitHub pages][10] (updated weekly, from a nightly job).
 1. As artifacts from CI builds (updated weekly, from a nightly job).
 
 ## `dasht` one-liner
@@ -22,14 +22,24 @@ If you use [`dasht`][6], you can launch it and search against all docsets as
 follows:
 
 ```bash
-DASHT_DOCSETS_DIR=(nix build github:aldur/nixpkgs.docset --print-out-paths) nix run nixpkgs#dasht fetchfromgithub
+DASHT_DOCSETS_DIR=$(nix build github:aldur/nixpkgs.docset --print-out-paths) nix run nixpkgs#dasht fetchfromgithub
 ```
 
-You can also get the manuals for a specific `nixpkgs` version by adding
-`--override-input nixpkgs nixpkgs` to `nix build`:
+If you don't want to build the docs, you can get the [latest `.tgz`][11] that
+includes them all:
 
 ```bash
-DASHT_DOCSETS_DIR=(nix build --override-input nixpkgs nixpkgs github:aldur/nixpkgs.docset --print-out-paths) nix run nixpkgs#dasht fetchfromgithub
+DASHT_DOCSETS_DIR=${mktmp -d}
+export DASHT_DOCSETS_DIR
+curl https://aldur.github.io/nixpkgs.docset/all.tgz | tar -xzf - -C $DASHT_DOCSETS_DIR
+nix run nixpkgs#dasht fetchfromgithub
+```
+
+You can also get the manuals for a specific `nixpkgs` version by overriding the
+`nixpkgs` input in `nix build`:
+
+```bash
+DASHT_DOCSETS_DIR=$(nix build --override-input nixpkgs nixpkgs github:aldur/nixpkgs.docset --print-out-paths) nix run nixpkgs#dasht fetchfromgithub
 ```
 
 ## Build
@@ -71,3 +81,5 @@ packages will be in the online cache), but unfortunately `nix-manual` requires
 [7]: https://devdocs.io/nix/
 [8]: https://github.com/boinkor-net/nix-dash-docsets.md
 [9]: https://nixosbrasil.github.io/nix-docgen/
+[10]: https://aldur.github.io/nixpkgs.docset
+[11]: https://aldur.github.io/nixpkgs.docset/all.tgz
