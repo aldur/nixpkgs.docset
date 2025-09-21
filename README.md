@@ -52,7 +52,7 @@ dr-xr-xr-x  4 root  wheel  128 Jan  1  1970 nixpkgs.docset
 
 The build against `nixpkgs-unstable` will generally be fast (because most
 packages will be in the online cache), but unfortunately `nix-manual` requires
-`nix-cli` and will most likely build from source, taking some time.
+`nix-cli` and will most likely build from source, taking some time to do that.
 
 ## Similar projects
 

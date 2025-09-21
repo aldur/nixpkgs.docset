@@ -2,7 +2,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '* * * * 0'
+    - cron: '42 5 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -16,9 +16,7 @@ permissions:
   id-token: write
 
 jobs:
-  build_docsets:
-    permissions:  # This job doesn't need any additional permission.
-      contents: read
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
@@ -31,20 +29,10 @@ jobs:
           name: all-nix-docsets
           path: result/*.docset
           if-no-files-found: "error"
-
-  build_index:
-    needs: build_docsets
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@90bb610b90bf290cad97484ba341453bd1cbefea # v19
-      - name: Setup Pages
-        id: pages
+      - id: pages
         uses: actions/configure-pages@v5
-      - name: Build index
-        run: nix build .#index
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - run: nix build .#index
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: ./result
 
