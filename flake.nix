@@ -36,6 +36,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       nix,
       nix-darwin,
@@ -73,9 +74,10 @@
           '';
         };
 
+        nixpkgs-version = pkgs.lib.trivial.version;
         nixpkgs-docset = pkgs.stdenv.mkDerivation {
           pname = "nixpkgs-docset";
-          version = pkgs.lib.trivial.version;
+          version = nixpkgs-version;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -108,9 +110,10 @@
           # Because of lazy evaluation, this works.
           (import (nixpkgs + "/nixos/release.nix") { supportedSystems = [ system ]; }).manualHTML.${system};
 
+        nixos-version = pkgs.lib.trivial.version;
         nixos-docset = pkgs.stdenv.mkDerivation {
           pname = "nixos-docset";
-          version = pkgs.lib.trivial.version;
+          version = nixos-version;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -137,9 +140,10 @@
         };
 
         nix-darwin-manual = nix-darwin.packages.${system}.manualHTML;
+        nix-darwin-version = nix-darwin.rev;
         nix-darwin-docset = pkgs.stdenv.mkDerivation {
           pname = "nix-darwin-docset";
-          version = nix-darwin.rev;
+          version = nix-darwin-version;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -166,9 +170,10 @@
         };
 
         nix-manual = nix.packages.${system}.nix-manual;
+        nix-version = nix-manual.version;
         nix-docset = pkgs.stdenv.mkDerivation {
           pname = "nix-docset";
-          version = nix-manual.version;
+          version = nix-version;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -195,9 +200,10 @@
         };
 
         home-manager-manual = home-manager.packages.${system}.docs-html;
+        home-manager-version = (nixpkgs.lib.importJSON (home-manager + "/release.json")).release;
         home-manager-docset = pkgs.stdenv.mkDerivation {
           pname = "home-manager-docset";
-          version = (nixpkgs.lib.importJSON (home-manager + "/release.json")).release;
+          version = home-manager-version;
 
           src = pkgs.lib.fileset.toSource {
             root = ./.;
@@ -232,11 +238,61 @@
               nix-darwin-docset
               home-manager-docset
             ];
+
+            version = "${pkgs.lib.trivial.release}/${pkgs.lib.trivial.versionSuffix}";
           in
-          {
+          rec {
             default = pkgs.symlinkJoin {
-              name = "nix docsets";
+              name = "all nix docsets";
               paths = all;
+            };
+
+            all-tgz = pkgs.stdenv.mkDerivation {
+              inherit version;
+              pname = "all nix docsets targz";
+
+              src = default;
+              buildPhase = ''
+                find . -maxdepth 1 -mindepth 1 -type d -name '*docset' -exec tar -cvzf {}.tgz {} \;
+                tar -cvzf all.tgz *.docset;
+              '';
+
+              installPhase = ''
+                mkdir -p $out/
+                runHook preInstall
+                mv *.tgz $out/
+                runHook postInstall
+              '';
+            };
+
+            index = pkgs.stdenv.mkDerivation {
+              inherit version;
+              pname = "html index";
+
+              src = all-tgz;
+
+              buildPhase =
+                let
+                  template = pkgs.replaceVars ./index.html.template {
+                    inherit
+                      nix-version
+                      nix-darwin-version
+                      nixpkgs-version
+                      home-manager-version
+                      nixos-version
+                      ;
+                  };
+                in
+                ''
+                  cp ${template} index.html
+                '';
+
+              installPhase = ''
+                mkdir -p $out/
+                runHook preInstall
+                mv * $out/
+                runHook postInstall
+              '';
             };
           }
           // builtins.listToAttrs (

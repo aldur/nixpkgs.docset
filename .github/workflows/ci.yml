@@ -1,22 +1,60 @@
 on:
-  pull_request:
   push:
     branches: [main]
   schedule:
     - cron: '* * * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  lints:
-    name: Build
+  build_docsets:
+    permissions:  # This job doesn't need any additional permission.
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
-      - uses: DeterminateSystems/nix-installer-action@a48face58194521af687ce7df4c802b1b558e743
+      - uses: DeterminateSystems/nix-installer-action@90bb610b90bf290cad97484ba341453bd1cbefea # v19
       - run: nix flake update
         if: ${{ github.event_name == 'schedule' }}
       - run: nix build .
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
-          name: nix-docsets
+          name: all-nix-docsets
           path: result/*.docset
           if-no-files-found: "error"
+
+  build_index:
+    needs: build_docsets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@90bb610b90bf290cad97484ba341453bd1cbefea # v19
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Build index
+        run: nix build .#index
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./result
+
+  deploy_to_pages:
+    needs: build_index
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

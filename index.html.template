@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dash Docsets for Nix</title>
+    <style>
+      :root {
+        --bg-color: #f8f9fa;
+        --text-color: #212529;
+        --card-bg-color: #ffffff;
+        --primary-color: #495057;
+        --primary-hover-color: #0077b6;
+        --all-btn-start: #0077b6;
+        --all-btn-end: #005f8d;
+        --all-btn-text: #ffffff;
+        --shadow-color: rgba(0, 0, 0, 0.08);
+        --border-color: #dee2e6;
+        --footer-text-color: #6c757d;
+        --version-bg-color: #e9ecef; /* Added for version badge */
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-color);
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px 20px;
+        background-color: var(--bg-color);
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--text-color);
+        font-size: 2.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      p.intro {
+          text-align: center;
+          color: var(--primary-color);
+          font-size: 1.1rem;
+          margin-bottom: 40px;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      
+      ul + ul {
+        margin-top: 30px;
+      }
+
+      li {
+        margin-bottom: 12px;
+      }
+
+      li a {
+        display: flex; /* Changed */
+        align-items: center; /* Added */
+        justify-content: space-between; /* Added */
+        background-color: var(--card-bg-color);
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        text-decoration: none;
+        color: var(--text-color);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        position: relative;
+        padding-left: 55px;
+        border: 1px solid var(--border-color);
+        font-weight: 500;
+      }
+
+      li a:before {
+        content: "📖";
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5em;
+        opacity: 0.8;
+      }
+
+      li a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 14px var(--shadow-color);
+        color: var(--primary-hover-color);
+        border-color: var(--primary-hover-color);
+      }
+
+      li a:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 6px var(--shadow-color);
+      }
+      
+      li a::after {
+        content: '↓'; 
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5em;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+      }
+
+      li a:hover::after {
+        opacity: 1;
+      }
+      
+      /* New rules for version badges */
+      .docset-title {
+        margin-right: 15px; 
+      }
+
+      .docset-version {
+        font-size: 0.85em;
+        font-weight: 500;
+        color: var(--primary-color);
+        background-color: var(--version-bg-color);
+        padding: 3px 10px;
+        border-radius: 12px;
+        white-space: nowrap;
+        margin-right: 20px;
+      }
+
+      .all-docsets a {
+        background-image: linear-gradient(to right, var(--all-btn-start), var(--all-btn-end));
+        color: var(--all-btn-text);
+        font-weight: bold;
+        border: none;
+      }
+
+      .all-docsets a:hover {
+        color: var(--all-btn-text);
+        box-shadow: 0 7px 14px rgba(0, 119, 182, 0.25);
+        border: none;
+      }
+
+      .page-footer {
+        text-align: center;
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+        color: var(--footer-text-color);
+      }
+
+      .page-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .page-footer a:hover {
+        color: var(--primary-hover-color);
+        text-decoration: underline;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>nix docsets</h1>
+    <p class="intro">
+      for Dash, Zeal, and dasht
+    </p>
+
+    <ul>
+      <li class="all-docsets"><a href="./result/all.tgz" title="Download all docsets as a single archive">All</a></li>
+    </ul>
+
+    <ul>
+      <li>
+        <a href="./result/nix.docset.tgz" title="Download the Nix reference manual">
+          <span class="docset-title">Nix Reference Manual</span>
+          <span class="docset-version">@nix-version@</span>
+        </a>
+      </li>
+      <li>
+        <a href="./result/nixpkgs.docset.tgz" title="Download the Nixpkgs reference manual">
+          <span class="docset-title">Nixpkgs Reference Manual</span>
+          <span class="docset-version">@nixpkgs-version@</span>
+        </a>
+      </li>
+      <li>
+        <a href="./result/nixos.docset.tgz" title="Download the NixOS Manual">
+          <span class="docset-title">NixOS Manual</span>
+          <span class="docset-version">@nixos-version@</span>
+        </a>
+      </li>
+      <li>
+        <a href="./result/nix-darwin.docset.tgz" title="Download the nix-darwin Manual">
+          <span class="docset-title">nix-darwin Manual</span>
+          <span class="docset-version">@nix-darwin-version@</span>
+        </a>
+      </li>
+      <li>
+        <a href="./result/home-manager.docset.tgz" title="Download the Home Manager Manual">
+          <span class="docset-title">Home Manager Manual</span>
+          <span class="docset-version">@home-manager-version@</span>
+        </a>
+      </li>
+    </ul>
+
+    <footer class="page-footer">
+        <p>
+            Source: <a href="https://github.com/aldur/nixpkgs.docset" target="_blank" rel="noopener noreferrer">github:aldur/nixpkgs.docset</a>
+        </p>
+    </footer>
+
+  </body>
+</html>
