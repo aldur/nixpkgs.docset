@@ -37,7 +37,7 @@ jobs:
           path: ./result
 
   deploy_to_pages:
-    needs: build_index
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
