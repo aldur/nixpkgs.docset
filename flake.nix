@@ -11,7 +11,7 @@
   inputs.nix = {
     url = "github:NixOS/nix";
 
-    # inputs.nixpkgs.follows = "nixpkgs";
+    inputs.nixpkgs.follows = "nixpkgs";
     inputs.nixpkgs-23-11.follows = "";
     inputs.nixpkgs-regression.follows = "";
     inputs.flake-compat.follows = "";
@@ -26,6 +26,12 @@
 
   inputs.nix-darwin = {
     url = "github:LnL7/nix-darwin";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  inputs.nixos-homepage = {
+    url = "github:NixOS/nixos-homepage";
+    flake = false; # We just need it to get the favicon
   };
 
   outputs =
@@ -35,20 +41,20 @@
       nix-darwin,
       flake-utils,
       home-manager,
+      nixos-homepage,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
+        # Version the favicon from the homepage repo, so we can manage it as a flake input.
+        # Otherwise, fixed output derivation from the online favicon would continue to break.
         favicon = pkgs.stdenv.mkDerivation rec {
           name = "nix-favicon";
-          version = "2025-02-27";
-
-          src = pkgs.fetchurl {
-            url = "https://nixos.org/favicon.ico";
-            hash = "sha256-58CkYxFA9Baioz3+avCQocft/AW9sgOLTPV71gxKD2g=";
-          };
+          version = nixos-homepage.rev;
+          src = "${nixos-homepage}/core/public/logo/nixos-logomark-default-gradient-minimal.svg";
 
           dontUnpack = true;
           buildInputs = [
