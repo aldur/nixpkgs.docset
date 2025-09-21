@@ -36,7 +36,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       nix,
       nix-darwin,
@@ -252,10 +251,14 @@
               pname = "all nix docsets targz";
 
               src = default;
-              buildPhase = ''
-                find . -maxdepth 1 -mindepth 1 -type d -name '*docset' -exec tar -cvzf {}.tgz {} \;
-                tar -cvzf all.tgz *.docset;
-              '';
+              buildPhase =
+                let
+                  tar = "tar --dereference -czf";
+                in
+                ''
+                  find . -maxdepth 1 -mindepth 1 -type d -name '*docset' -exec ${tar} {}.tgz {} \;
+                  ${tar} all.tgz *.docset;
+                '';
 
               installPhase = ''
                 mkdir -p $out/
