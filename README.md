@@ -22,14 +22,16 @@ If you use [`dasht`][6], you can launch it and search against all docsets as
 follows:
 
 ```bash
-DASHT_DOCSETS_DIR=$(nix build github:aldur/nixpkgs.docset --print-out-paths) nix run nixpkgs#dasht fetchfromgithub
+DASHT_DOCSETS_DIR=$(nix build github:aldur/nixpkgs.docset --print-out-paths) 
+export DASHT_DOCSETS_DIR
+nix run nixpkgs#dasht fetchfromgithub
 ```
 
 If you don't want to build the docs, you can get the [latest `.tgz`][11] that
 includes them all:
 
 ```bash
-DASHT_DOCSETS_DIR=${mktmp -d}
+DASHT_DOCSETS_DIR=${mktmp -d}  # or $HOME/.local/share/dasht/docsets/
 export DASHT_DOCSETS_DIR
 curl https://aldur.github.io/nixpkgs.docset/all.tgz | tar -xzf - -C $DASHT_DOCSETS_DIR
 nix run nixpkgs#dasht fetchfromgithub
@@ -39,7 +41,7 @@ You can also get the manuals for a specific `nixpkgs` version by overriding the
 `nixpkgs` input in `nix build`:
 
 ```bash
-DASHT_DOCSETS_DIR=$(nix build --override-input nixpkgs nixpkgs github:aldur/nixpkgs.docset --print-out-paths) nix run nixpkgs#dasht fetchfromgithub
+DASHT_DOCSETS_DIR=$(nix build --override-input nixpkgs nixpkgs github:aldur/nixpkgs.docset --print-out-paths)
 ```
 
 ## Build
