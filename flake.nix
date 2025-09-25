@@ -1,5 +1,6 @@
 {
-  description = "Dash/Zeal docset for nix-manual, nixpkgs-manual, and nixos-manual";
+  description =
+    "Dash/Zeal docset for nix-manual, nixpkgs-manual, and nixos-manual";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   inputs.systems.url = "github:nix-systems/default";
@@ -34,18 +35,9 @@
     flake = false; # We just need it to get the favicon
   };
 
-  outputs =
-    {
-      nixpkgs,
-      nix,
-      nix-darwin,
-      flake-utils,
-      home-manager,
-      nixos-homepage,
-      ...
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
+  outputs = { nixpkgs, nix, nix-darwin, flake-utils, home-manager
+    , nixos-homepage, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
@@ -54,12 +46,11 @@
         favicon = pkgs.stdenv.mkDerivation rec {
           name = "nix-favicon";
           version = nixos-homepage.rev;
-          src = "${nixos-homepage}/core/public/logo/nixos-logomark-default-gradient-minimal.svg";
+          src =
+            "${nixos-homepage}/core/public/logo/nixos-logomark-default-gradient-minimal.svg";
 
           dontUnpack = true;
-          buildInputs = [
-            pkgs.imagemagick
-          ];
+          buildInputs = [ pkgs.imagemagick ];
 
           buildPhase = ''
             magick "${src}" -thumbnail 32x32 -alpha on -background none -flatten "favicon.png"
@@ -83,9 +74,7 @@
             fileset = ./nixpkgs.dashing.json;
           };
 
-          buildInputs = [
-            pkgs.dashing
-          ];
+          buildInputs = [ pkgs.dashing ];
 
           buildPhase = ''
             cp ${favicon}/favicon.png .
@@ -107,7 +96,9 @@
         nixos-manual =
           # NOTE: We kinda hack it here by forcing it to support any `system` (including macOS)
           # Because of lazy evaluation, this works.
-          (import (nixpkgs + "/nixos/release.nix") { supportedSystems = [ system ]; }).manualHTML.${system};
+          (import (nixpkgs + "/nixos/release.nix") {
+            supportedSystems = [ system ];
+          }).manualHTML.${system};
 
         nixos-version = pkgs.lib.trivial.version;
         nixos-docset = pkgs.stdenv.mkDerivation {
@@ -119,9 +110,7 @@
             fileset = ./nixos.dashing.json;
           };
 
-          buildInputs = [
-            pkgs.dashing
-          ];
+          buildInputs = [ pkgs.dashing ];
 
           buildPhase = ''
             cp ${favicon}/favicon.png .
@@ -149,9 +138,7 @@
             fileset = ./nix-darwin.dashing.json;
           };
 
-          buildInputs = [
-            pkgs.dashing
-          ];
+          buildInputs = [ pkgs.dashing ];
 
           buildPhase = ''
             cp ${favicon}/favicon.png .
@@ -179,9 +166,7 @@
             fileset = ./nix.dashing.json;
           };
 
-          buildInputs = [
-            pkgs.dashing
-          ];
+          buildInputs = [ pkgs.dashing ];
 
           buildPhase = ''
             cp -r "${nix-manual}/share/doc/nix/manual/." .
@@ -199,7 +184,8 @@
         };
 
         home-manager-manual = home-manager.packages.${system}.docs-html;
-        home-manager-version = (nixpkgs.lib.importJSON (home-manager + "/release.json")).release;
+        home-manager-version =
+          (nixpkgs.lib.importJSON (home-manager + "/release.json")).release;
         home-manager-docset = pkgs.stdenv.mkDerivation {
           pname = "home-manager-docset";
           version = home-manager-version;
@@ -209,9 +195,7 @@
             fileset = ./home-manager.dashing.json;
           };
 
-          buildInputs = [
-            pkgs.dashing
-          ];
+          buildInputs = [ pkgs.dashing ];
 
           buildPhase = ''
             cp ${favicon}/favicon.png .
@@ -226,84 +210,68 @@
             runHook postInstall
           '';
         };
-      in
-      {
-        packages =
-          let
-            all = [
-              nixpkgs-docset
-              nixos-docset
-              nix-docset
-              nix-darwin-docset
-              home-manager-docset
-            ];
+      in {
+        packages = let
+          all = [
+            nixpkgs-docset
+            nixos-docset
+            nix-docset
+            nix-darwin-docset
+            home-manager-docset
+          ];
 
-            version = "${pkgs.lib.trivial.release}/${pkgs.lib.trivial.versionSuffix}";
-          in
-          rec {
-            default = pkgs.symlinkJoin {
-              name = "all nix docsets";
-              paths = all;
-            };
+          version =
+            "${pkgs.lib.trivial.release}/${pkgs.lib.trivial.versionSuffix}";
+        in rec {
+          default = pkgs.symlinkJoin {
+            name = "all nix docsets";
+            paths = all;
+          };
 
-            all-tgz = pkgs.stdenv.mkDerivation {
-              inherit version;
-              pname = "all nix docsets targz";
+          all-tgz = pkgs.stdenv.mkDerivation {
+            inherit version;
+            pname = "all nix docsets targz";
 
-              src = default;
-              buildPhase =
-                let
-                  tar = "tar --dereference -czf";
-                in
-                ''
-                  find . -maxdepth 1 -mindepth 1 -type d -name '*docset' -exec ${tar} {}.tgz {} \;
-                  ${tar} all.tgz *.docset;
-                '';
+            src = default;
+            buildPhase = let tar = "tar --dereference --mode='a+rw' -czf";
+            in ''
+              find . -maxdepth 1 -mindepth 1 -type d -name '*docset' -exec ${tar} {}.tgz {} \;
+              ${tar} all.tgz *.docset;
+            '';
 
-              installPhase = ''
-                mkdir -p $out/
-                runHook preInstall
-                mv *.tgz $out/
-                runHook postInstall
-              '';
-            };
+            installPhase = ''
+              mkdir -p $out/
+              runHook preInstall
+              mv *.tgz $out/
+              runHook postInstall
+            '';
+          };
 
-            index = pkgs.stdenv.mkDerivation {
-              inherit version;
-              pname = "html index";
+          index = pkgs.stdenv.mkDerivation {
+            inherit version;
+            pname = "html index";
 
-              src = all-tgz;
+            src = all-tgz;
 
-              buildPhase =
-                let
-                  template = pkgs.replaceVars ./index.html.template {
-                    inherit
-                      nix-version
-                      nix-darwin-version
-                      nixpkgs-version
-                      home-manager-version
-                      nixos-version
-                      ;
-                  };
-                in
-                ''
-                  cp ${template} index.html
-                '';
+            buildPhase = let
+              template = pkgs.replaceVars ./index.html.template {
+                inherit nix-version nix-darwin-version nixpkgs-version
+                  home-manager-version nixos-version;
+              };
+            in ''
+              cp ${template} index.html
+            '';
 
-              installPhase = ''
-                mkdir -p $out/
-                runHook preInstall
-                mv * $out/
-                runHook postInstall
-              '';
-            };
-          }
-          // builtins.listToAttrs (
-            map (value: {
-              name = value.pname;
-              inherit value;
-            }) all
-          );
-      }
-    );
+            installPhase = ''
+              mkdir -p $out/
+              runHook preInstall
+              mv * $out/
+              runHook postInstall
+            '';
+          };
+        } // builtins.listToAttrs (map (value: {
+          name = value.pname;
+          inherit value;
+        }) all);
+      });
 }
