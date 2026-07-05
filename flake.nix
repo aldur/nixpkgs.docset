@@ -127,7 +127,15 @@
           '';
         };
 
-        nix-darwin-manual = nix-darwin.packages.${system}.manualHTML;
+        nix-darwin-manual =
+          # nix-darwin still passes `--toc-depth`/`--chunk-toc-depth`, both
+          # replaced in nixos-render-docs by `--sidebar-depth`. Rewrite the
+          # flags until upstream catches up (then this becomes a no-op).
+          nix-darwin.packages.${system}.manualHTML.overrideAttrs (old: {
+            buildCommand =
+              builtins.replaceStrings [ "--toc-depth 1" "--chunk-toc-depth 1" ]
+              [ "--sidebar-depth 1" "" ] old.buildCommand;
+          });
         nix-darwin-version = nix-darwin.rev;
         nix-darwin-docset = pkgs.stdenv.mkDerivation {
           pname = "nix-darwin-docset";
